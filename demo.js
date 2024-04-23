@@ -35,7 +35,7 @@ function init() {
   scene = new THREE.Scene();
 
   const light = new THREE.HemisphereLight( 0xffffff, 0x888888, 3 );
-  light.position.set( 0, 1, 0 );
+  light.position.set( 0, 5, 0 );
   scene.add( light );
   const white = 0xffffff;
   const red = 0xff0000;
@@ -47,22 +47,19 @@ function init() {
 
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material =
-    [new THREE.MeshPhongMaterial( { color:  white }),
-    new THREE.MeshPhongMaterial( { color: red }),
+    [new THREE.MeshPhongMaterial( { color:  white}),
+    new THREE.MeshPhongMaterial( { color: red}),
     new THREE.MeshPhongMaterial( { color: yellow }),
     new THREE.MeshPhongMaterial( { color: blue }),
     new THREE.MeshPhongMaterial( { color: orange }),
     new THREE.MeshPhongMaterial( { color: green })]
-
+// Normal vectors are the same as the position of the cube.
     // white: 1,0,0
     // yellow: 0,1,0
     // orange: 0,0,1
     // green: 0,0,-1
     // red: -1,0,0
     // blue: 0,-1,0
-
-  // We know the normal vector for each colored face
-//  const material = new THREE.MeshPhongMaterial( {color: 0xffffff});
 
   mesh = new THREE.InstancedMesh( geometry, material, count );
 
@@ -82,9 +79,7 @@ function init() {
         const tmp_matrix = matrix.clone();
         tmp_matrix.makeRotationFromEuler(new THREE.Euler( 0, Math.PI, 1, 'XYZ' ));
         mesh.setColorAt( i, color );
-
         i ++;
-
       }
     }
   };
@@ -153,12 +148,11 @@ const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 // red: -1,0,0
 // blue: 0,-1,0
 
-function rotate(normal, clockwise, angle = Math.PI/2){
+async function rotate(normal, clockwise, angle = Math.PI/20){
+  for (let j = 0; j<10;j++){
   console.log('rotate');
   // We can take the normal vector create a plane and find the closest intersections
   let dists = new Map();
-  // TODO(morleyd): Offsets is not an accurate measure of position after a single rotation.
-  // TODO(morleyd): For some reason this causing crash
 
   for (let index = 0; index<27; index++){
     let tmp_matrix = new THREE.Matrix4();
@@ -166,7 +160,7 @@ function rotate(normal, clockwise, angle = Math.PI/2){
     mesh.getMatrixAt(index, tmp_matrix);
     offset.setFromMatrixPosition(tmp_matrix);
 
-    let dist = computeDistFromPlane(normal, offset.x, offset.y, offset.z);
+    let dist = Math.round(computeDistFromPlane(normal, offset.x, offset.y, offset.z));
     if (!dists.has(dist)){
       dists.set(dist, []);
     }
@@ -180,6 +174,8 @@ function rotate(normal, clockwise, angle = Math.PI/2){
     closest_dist = Math.min(key, closest_dist);
   });
   let cube_face = dists.get(closest_dist);
+  // Use the normal to determine the position to move to as
+  // it's the same as the center face.
   console.log("Faces: "+cube_face);
   for (let index = 0; index <cube_face.length; index++){
     const face = cube_face[index];
@@ -191,22 +187,34 @@ function rotate(normal, clockwise, angle = Math.PI/2){
     if (clockwise){
       rot_angle = -rot_angle;
     }
+    let trans_matrix = new THREE.Matrix4();
+    trans_matrix.makeTranslation(normal);
+    let rev_matrix = new THREE.Matrix4();
+    let rev_normal = new THREE.Vector3(-normal.x, -normal.y, -normal.z);
+    rev_matrix.makeTranslation(rev_normal);
+
     // TODO(morleyd): Fix direction of rotation so we can show smooth animation.
     rot_matrix.makeRotationFromEuler(new THREE.Euler( normal.x*rot_angle, normal.y * rot_angle, normal.z*rot_angle, 'XYZ' ));
-    rot_matrix.multiply(matrix);
-    mesh.setMatrixAt(face, rot_matrix);
+   // rot_matrix.multiply(trans_matrix)
+    //console.log("rot_matrix "+rot_matrix.elements);
+    //rev_matrix.multiply(rot_matrix);
+    //console.log("rev_matrix "+rev_matrix.elements);
+    //matrix.multiply(rev_matrix);
+    //console.log("matrix "+matrix.elements);
+
+    rev_matrix.multiply(rot_matrix).multiply(trans_matrix).multiply(matrix);
+    // originally had rot_matrix.multiply(matrix)
+    // rot_matrix.multiply(rev_matrix).multiply(matrix).multiply(trans_matrix);
+    mesh.setMatrixAt(face, rev_matrix);
    // mesh.setColorAt(face, new THREE.Color().setHex(0xa020f0));
     mesh.instanceMatrix.needsUpdate = true;
-   // mesh.instanceColor.needsUpdate = true;
-
   }
+  await sleep(10);
+}
 }
 // TODO(morleyd): specify the other directions as well as clockwise/counterclockwise
 async function rotateRed(clockwise){
-  //for (let i = 0; i<20; i++){
-  rotate(new THREE.Vector3(-1,0,0), clockwise, Math.PI/40);
-//  await sleep(10);
-//  }
+  rotate(new THREE.Vector3(-1,0,0), clockwise);
 }
 function rotateBlue(clockwise){
   rotate(new THREE.Vector3(0,-1, 0), clockwise);
