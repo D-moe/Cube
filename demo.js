@@ -96,7 +96,8 @@ function init() {
   for (const [key, value] of Object.entries(gui_dict)) {
     gui.add(gui_dict, key);
   }
-  gui.add({'Run': function(){run()}}, "Run");
+  gui.add({'Run': function(){Run()}}, "Run");
+  gui.add({'Shuffle': function(){Shuffle()}, "Shuffle");
  // gui.add(highlight_face, 'check').name('highlight_face');
 
   renderer = new THREE.WebGLRenderer({antialias: true});
@@ -211,12 +212,19 @@ async function rotateStr(str) {
   }
 }
 
-async function run(){
+async function Run(){
   for (let i = 0; i<arr.length; i++){
     const move = arr[i];
     await rotateStr(move);
   }
 }
+async function Shuffle(){
+  for (let i = 0; i<shuffle.length; i++){
+    const move = shuffle[i];
+    await rotateStr(move);
+  }
+}
+
 
 function onMouseMove(event) {
   event.preventDefault();
