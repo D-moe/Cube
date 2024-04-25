@@ -207,7 +207,7 @@ async function rotateStr(str) {
   } else if (str == 'Y') {
     await rotate(new THREE.Vector3(0, 1, 0), true);
   } else if (str == 'Y*') {
-    await rotate(new THREE.Vector3(1, 0, 0), false);
+    await rotate(new THREE.Vector3(0, 1, 0), false);
   }
 }
 
