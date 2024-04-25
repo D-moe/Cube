@@ -97,7 +97,7 @@ function init() {
     gui.add(gui_dict, key);
   }
   gui.add({'Run': function(){Run()}}, "Run");
-  gui.add({'Shuffle': function(){Shuffle()}, "Shuffle");
+  gui.add({'Shuffle': function(){Shuffle()}}, "Shuffle");
  // gui.add(highlight_face, 'check').name('highlight_face');
 
   renderer = new THREE.WebGLRenderer({antialias: true});
