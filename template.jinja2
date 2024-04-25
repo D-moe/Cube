@@ -61,9 +61,12 @@
 
     scene = new THREE.Scene();
 
-    const light = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
-    light.position.set(0, 5, 0);
-    scene.add(light);
+    const light1 = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
+    const light2 = new THREE.HemisphereLight(0xffffff, 0x888888, 3);
+    light1.position.set(0, -5, 0);
+    light2.position.set(0, 5, 0);
+    scene.add(light1);
+    scene.add(light2);
     const white = 0xffffff;
     const red = 0xff0000;
     const yellow = 0xffff00;
@@ -74,13 +77,15 @@
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = [
-      new THREE.MeshPhongMaterial({color: white}),
+      new THREE.MeshPhongMaterial({color: orange}),
       new THREE.MeshPhongMaterial({color: red}),
       new THREE.MeshPhongMaterial({color: yellow}),
-      new THREE.MeshPhongMaterial({color: blue}),
-      new THREE.MeshPhongMaterial({color: orange}),
-      new THREE.MeshPhongMaterial({color: green})
+      new THREE.MeshPhongMaterial({color: white}),
+      new THREE.MeshPhongMaterial({color: green}),
+      new THREE.MeshPhongMaterial({color: blue})
     ]
+    // Our green is there blue
+    // TODO(morleyd): Old normals
     // Normal vectors are the same as the position of the cube.
     // white: 1,0,0
     // yellow: 0,1,0
@@ -218,21 +223,23 @@
       await rotate(new THREE.Vector3(-1, 0, 0), true);
     } else if (str == 'R*') {
       await rotate(new THREE.Vector3(-1, 0, 0), false);
-    } else if (str == 'B') {
-      await rotate(new THREE.Vector3(0, -1, 0), true);
-    } else if (str == 'B*') {
-      await rotate(new THREE.Vector3(0, -1, 0), false);
-    } else if (str == 'G') {
-      await rotate(new THREE.Vector3(0, 0, -1), true);
-    } else if (str == 'G*') {
-      await rotate(new THREE.Vector3(0, 0, -1), false);
-    } else if (str == 'O') {
-      await rotate(new THREE.Vector3(0, 0, 1), true);
-    } else if (str == 'O*') {
-      await rotate(new THREE.Vector3(0, 0, 1), false);
     } else if (str == 'W') {
-      await rotate(new THREE.Vector3(1, 0, 0), true);
+      await rotate(new THREE.Vector3(0, -1, 0), true);
     } else if (str == 'W*') {
+      await rotate(new THREE.Vector3(0, -1, 0), false);
+    } else if (str == 'B') {
+      await rotate(new THREE.Vector3(0, 0, -1), true);
+    } else if (str == 'B*') {
+      await rotate(new THREE.Vector3(0, 0, -1), false);
+    } else if (str == 'G') {
+      await rotate(new THREE.Vector3(0, 0, 1), true);
+    } else if (str == 'G*') {
+      await rotate(new THREE.Vector3(0, 0, 1), false);
+      // Our white is their green
+      // Our green is their blue
+    } else if (str == 'O') {
+      await rotate(new THREE.Vector3(1, 0, 0), true);
+    } else if (str == 'O*') {
       await rotate(new THREE.Vector3(1, 0, 0), false);
     } else if (str == 'Y') {
       await rotate(new THREE.Vector3(0, 1, 0), true);
